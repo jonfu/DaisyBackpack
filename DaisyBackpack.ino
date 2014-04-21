@@ -7,6 +7,7 @@
 #define trigPin 13
 #define echoPin 12
 #define distDiffThreshod 25
+#define TOOCLOSE 3
 
 const int petal[] = { 5, 6, 8, 9, 10, 11, 2, 3 };
 
@@ -23,7 +24,9 @@ long distDiff = 0;
 int mode = 0;
 int wait = 144;
 int petalIndex = PETALSIZE-1;
+int fadeValue = 200;
 boolean pixelRunning = false;
+boolean fadeOut = true;
 
 void setup() {
   //Serial.begin (9600);
@@ -74,9 +77,14 @@ void calculateDistance() {
   dist = (duration/2) / 29.1;
   
   if (dist > 0 && dist < 200){
-    distDiff = abs(distance - dist);
-    if (distDiff > distDiffThreshod) {
-      changeMode();
+    
+    if ( (distance < TOOCLOSE) && (dist > distDiffThreshod)) {
+      mode = 0;
+    } else {
+      distDiff = abs(distance - dist);
+      if (distDiff > distDiffThreshod) {
+        changeMode();
+      }
     }
     distance = dist;
     wait = distance * 2;
@@ -95,12 +103,35 @@ void changeMode() {
 
 void updatePetal() {
   
-  digitalWrite(petal[petalIndex], LOW);
+  if (distance < TOOCLOSE) {
+    
+    if (fadeOut) {
+      fadeValue -= 15;
+    } else {
+      fadeValue += 15;
+    }
+    
+    fadeValue = constrain(fadeValue,0,100);   //  keep LED fade value from going into negative numbers!
+    
+    if (fadeValue == 0) {
+      fadeOut = false;
+    }
+    
+    if (fadeValue == 100) {
+      fadeOut = true; 
+    }
+    
+    for (int i=0; i<PETALSIZE; i++) {
+      analogWrite(petal[i], fadeValue);
+    }
+    
+  } else {
   
-  if (++petalIndex == PETALSIZE) {
-     petalIndex = 0; 
+    digitalWrite(petal[petalIndex], LOW);
+    if (++petalIndex == PETALSIZE) {
+       petalIndex = 0; 
+    }
+    digitalWrite(petal[petalIndex], HIGH);
   }
-  
-  digitalWrite(petal[petalIndex], HIGH);
   
 }

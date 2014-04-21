@@ -39,6 +39,12 @@ void wiper() {
   pixelRunning = true;
   
   while (true) {
+    
+    colorWipe(strip.Color(0, 0, 0)); // Black
+    if (mode != 0) {
+       pixelRunning = false;
+       return; 
+    }    
   
     colorWipe(strip.Color(0, 0, 64)); // Blue
     if (mode != 0) {
@@ -50,6 +56,13 @@ void wiper() {
        pixelRunning = false;
        return; 
     }
+    
+    colorWipe(strip.Color(0, 0, 0)); // Black
+    if (mode != 0) {
+       pixelRunning = false;
+       return; 
+    }      
+    
     colorWipe(strip.Color(64,64,0)); 
     if (mode != 0) {
        pixelRunning = false;
@@ -81,6 +94,26 @@ void wiper() {
        pixelRunning = false;
        return; 
     }
+    colorWipe(strip.Color(255,255,0)); 
+    if (mode != 0) {
+       pixelRunning = false;
+       return; 
+    }
+    colorWipe(strip.Color(64,64,0)); 
+    if (mode != 0) {
+       pixelRunning = false;
+       return; 
+    }
+    colorWipeReverse(strip.Color(255,255,0)); 
+    if (mode != 0) {
+       pixelRunning = false;
+       return; 
+    }
+    colorWipeReverse(strip.Color(64,64,0)); 
+    if (mode != 0) {
+       pixelRunning = false;
+       return; 
+    }    
   
   }
   
@@ -90,21 +123,24 @@ void rainbow() {
   uint16_t i, j;
   
   pixelRunning = true;
-  for(j=0; j<256; j++) {
-    if (mode != 1) {
-       pixelRunning = false;
-       return; 
+  
+  while (true) {
+    for(j=0; j<256; j++) {
+      if (mode != 1) {
+         pixelRunning = false;
+         return; 
+      }
+      for(i=0; i<strip.numPixels(); i++) {
+        strip.setPixelColor(i, Wheel((i+j) & 255));
+      }
+      strip.show();
+      if (++petalCounter == 3) {
+        petalCounter = 0;
+        updatePetal();
+      }
+      delay(wait);
+      calculateDistance();
     }
-    for(i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel((i+j) & 255));
-    }
-    strip.show();
-    if (++petalCounter == 3) {
-      petalCounter = 0;
-      updatePetal();
-    }
-    delay(wait);
-    calculateDistance();
   }
 }
  
@@ -113,22 +149,25 @@ void rainbowCycle() {
   uint16_t i, j;
   
   pixelRunning = true;
+  
+  while (true) {
    
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    if (mode != 2) {
-       pixelRunning = false;
-       return; 
+    for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+      if (mode != 2) {
+         pixelRunning = false;
+         return; 
+      }
+      for(i=0; i< strip.numPixels(); i++) {
+        strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
+      }
+      strip.show();
+      if (++petalCounter == 3) {
+          petalCounter = 0;
+          updatePetal();
+      }
+      delay(wait);
+      calculateDistance();
     }
-    for(i=0; i< strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
-    }
-    strip.show();
-    if (++petalCounter == 3) {
-        petalCounter = 0;
-        updatePetal();
-    }
-    delay(wait);
-    calculateDistance();
   }
 }
  
@@ -160,7 +199,11 @@ void colorWave() {
   stripsize = strip.numPixels();
   cycle = stripsize * 25; // times around the circle...
    
-  while (++tick % cycle) {
+  //while (++tick % cycle) {
+  while (true) {
+    if (++tick == cycle) {
+      tick = 0; 
+    }
     if (mode != 3) {
        pixelRunning = false;
        return; 
