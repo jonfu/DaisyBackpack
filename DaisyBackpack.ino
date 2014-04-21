@@ -6,7 +6,7 @@
 #define MODESIZE 4
 #define trigPin 13
 #define echoPin 12
-#define distDiffThreshod 25
+#define distDiffThreshod 20
 #define TOOCLOSE 3
 
 const int petal[] = { 5, 6, 8, 9, 10, 11, 2, 3 };
@@ -43,6 +43,11 @@ void setup() {
 
 void loop() {
   if (pixelRunning == false) {
+    
+      for (int i=0; i<PETALSIZE; i++) {
+        digitalWrite(petal[i], LOW);
+      }    
+    
      switch (mode) {
        case 0:
        wiper();
